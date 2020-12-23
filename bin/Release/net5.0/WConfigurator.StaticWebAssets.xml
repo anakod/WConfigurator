@@ -1,5 +1,0 @@
-﻿<StaticWebAssets Version="1.0">
-  <ContentRoot BasePath="/" Path="C:\DEV\ESP32\WConfigurator\bin\Release\net5.0\wwwroot\" />
-  <ContentRoot BasePath="/" Path="C:\DEV\ESP32\WConfigurator\obj\Release\net5.0\scopedcss\bundle\" />
-  <ContentRoot BasePath="_content/Blazm.Bluetooth" Path="C:\Users\anakod\.nuget\packages\blazm.bluetooth\0.0.2\build\..\staticwebassets\" />
-</StaticWebAssets>
