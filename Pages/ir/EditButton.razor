@@ -1,0 +1,97 @@
+﻿@page "/ir/edit/{Name}"
+@inject WatchService watch
+@inject InfraRemote irconfig;
+@inject NavigationManager uriHelper
+
+<h1>@Name</h1>
+
+
+@if (Model != null)
+{
+    <EditForm Model="@Model" OnValidSubmit="OnSubmit">
+        <p>
+            <label>
+                Mode:
+                <InputSelectEnum @bind-Value="@Model.Mode" />
+            </label>
+        </p>
+        <p>
+            <label>
+                Name:
+                <InputText @bind-Value="@Model.NewButtonName" />
+            </label>
+        </p>
+        <p>
+            @if (Model.Mode != InfraButtonMode.RAW && Model.Mode != InfraButtonMode.Disabled)
+            {
+                <label>
+                    Code:
+                    <InputText @bind-Value="@Model.HexCode" />
+                </label>
+                <div><small>@Model.Mode transmission protocol. Example value format: AB12CDEF</small></div>
+            }
+            else if (Model.Mode == InfraButtonMode.RAW)
+            {
+                <label>
+                    RAW:
+                    <InputTextArea @bind-Value="@Model.RawCode" cols="55" rows="4" />
+                </label>
+                <div><small>Example value format: [8950, 4400, 550, 550, 600 ..... 700,1500,700]</small></div>
+            }
+        </p>
+        <button type="submit" class="btn btn-primary">Save</button>
+        <button class="btn" @onclick="OnCancel">Cancel</button>
+    </EditForm>
+} else
+{
+    <div class="bs-callout bs-callout-warning">
+        <h5>Loading, please wait...</h5>
+        <img src="/img/loader-big.gif" alt="loading..." width="256" height="256"/>
+    </div>
+}
+
+
+@code {
+    [Parameter]
+    public string Name { get; set; }
+    protected ResponseButtonEdit Model { get; set; }
+    bool isSaving;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!watch.IsConnected)
+        {
+            uriHelper.NavigateTo($"/ir");
+            return;
+        }
+
+        watch.OnUpdate = new EventCallback(this, (Action)Updated);
+
+        // Let's read current button params as first step:
+        await irconfig.ExecuteShowEditButton(Name);
+    }
+
+    void Updated()
+    {
+        if (isSaving && irconfig.CurrentButton != null)
+        {
+            // New values successful saved
+            isSaving = false;
+            uriHelper.NavigateTo($"/ir");
+            return;
+        }
+
+        Model = irconfig.CurrentButton;
+    }
+
+    private async void OnSubmit()
+    {
+        isSaving = true;
+        await irconfig.ExecuteSaveEditButton(Model);
+    }
+
+    void OnCancel()
+    {
+        uriHelper.NavigateTo($"/ir");
+    }
+}

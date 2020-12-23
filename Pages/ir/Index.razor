@@ -1,0 +1,79 @@
+﻿@page "/ir"
+@inject WatchService watch
+@inject InfraRemote irconfig;
+@inject NavigationManager uriHelper
+
+<h1>InfraRed Remote Configuration</h1>
+
+@if (Buttons != null)
+{
+    @foreach (var button in Buttons)
+    {
+        <div class="bs-callout bs-callout-info">
+            <h5><span class="oi oi-bolt" aria-hidden="true"></span> @button.Name</h5>
+            <p>
+                <button @onclick="@(() => Edit(button.Name))" class="btn btn-info">edit</button>
+                <button @onclick="@(() => Delete(button.Name))" class="btn btn-info">delete</button>
+            </p>
+        </div>
+    }
+    <EditForm Model="@NewButtonModel">
+        <InputText @bind-Value="@NewButtonModel.Value" placceholder="ButtonName" />
+        <button class="btn btn-primary" @onclick="AddButton"><span class="oi oi-plus" aria-hidden="true"></span> Add new button</button>
+    </EditForm>
+}
+else if (!watch.IsConnected && !watch.IsWaitingForConnection)
+{
+    <p>Click Connect button to start</p>
+    <button class="btn btn-primary" @onclick="Connect">Connect</button>
+}
+else
+{
+    <img src="/img/loader-big.gif" alt="loading..." width="256" height="256"/>
+}
+
+@code {
+    IEnumerable<InfraButton> Buttons { get; set; }
+    InfraRequestValue NewButtonModel = new InfraRequestValue("", "");
+
+    protected override async Task OnInitializedAsync()
+    {
+        watch.OnUpdate = new EventCallback(this, (Func<Task>)UpdateUI);
+
+        if (watch.IsConnected)
+            await UpdateUI();
+    }
+
+    async Task UpdateUI()
+    {
+        if (irconfig.Buttons == null)
+        {
+            // Let's read current config as first step:
+            await irconfig.ExecuteShowList();
+        }
+
+        Buttons = irconfig.Buttons;
+    }
+
+    private async void Connect()
+    {
+        await watch.Connect();
+    }
+
+    private async void AddButton()
+    {
+        if (NewButtonModel.Value != null)
+            await irconfig.ExecuteAddNewButton(NewButtonModel.Value);
+        NewButtonModel.Value = "";
+    }
+
+    void Edit(string name)
+    {
+        uriHelper.NavigateTo($"/ir/edit/{name}");
+    }
+
+    async Task Delete(string name)
+    {
+        await irconfig.ExecuteDeleteButton(name);
+    }
+}
