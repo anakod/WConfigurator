@@ -1,4 +1,5 @@
 ﻿@page "/ir/edit/{Name}"
+@implements IDisposable
 @inject WatchService watch
 @inject InfraRemote irconfig;
 @inject NavigationManager uriHelper
@@ -42,11 +43,12 @@
         <button type="submit" class="btn btn-primary">Save</button>
         <button class="btn" @onclick="OnCancel">Cancel</button>
     </EditForm>
-} else
+}
+else
 {
     <div class="bs-callout bs-callout-warning">
         <h5>Loading, please wait...</h5>
-        <img src="/img/loader-big.gif" alt="loading..." width="256" height="256"/>
+        <img src="/img/loader-big.gif" alt="loading..." width="256" height="256" />
     </div>
 }
 
@@ -65,10 +67,15 @@
             return;
         }
 
-        watch.OnUpdate = new EventCallback(this, (Action)Updated);
+        watch.OnUpdate += EventCallback.Factory.Create(this, Updated);
 
         // Let's read current button params as first step:
         await irconfig.ExecuteShowEditButton(Name);
+    }
+
+    void IDisposable.Dispose()
+    {
+        watch.OnUpdate -= this;
     }
 
     void Updated()

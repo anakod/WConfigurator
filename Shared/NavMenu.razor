@@ -19,11 +19,14 @@
                 <span class="oi oi-audio" aria-hidden="true"></span> IR Remote
             </NavLink>
         </li>
-        @*<li class="nav-item px-3">
-            <a @onclick="@Connect" class="nav-link" href="ir">
-                <span class="oi oi-bluetooth" aria-hidden="true"></span> Connect
-            </a>
-        </li>*@
+        @if (!watch.IsConnected)
+        {
+            <li class="nav-item px-3">
+                <a @onclick="@Connect" class="nav-link" href="ir">
+                    <span class="oi oi-bluetooth" aria-hidden="true"></span> Connect
+                </a>
+            </li>
+        }
     </ul>
 </div>
 
@@ -31,6 +34,11 @@
     private bool collapseNavMenu = true;
 
     private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    protected override void OnInitialized()
+    {
+        watch.OnUpdate += this;
+    }
 
     private void ToggleNavMenu()
     {

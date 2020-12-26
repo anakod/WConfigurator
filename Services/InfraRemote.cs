@@ -27,7 +27,7 @@ namespace WConfigurator.Services
         {
             // Reset previous state
             buttons = null;
-            CurrentButton = null;
+            //CurrentButton = null;
         }
 
         public async Task ExecuteShowList()

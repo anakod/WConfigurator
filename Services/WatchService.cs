@@ -28,7 +28,7 @@ namespace WConfigurator.Services
 
         internal event Action OnBeforeCommand;
         public event Action<byte[]> OnDataReceived;
-        public EventCallback OnUpdate;
+        public MulticastEventCallback OnUpdate;
 
         public void AddHandler<T>(string app, Func<T, bool> handler)
         {
@@ -78,7 +78,6 @@ namespace WConfigurator.Services
                 int p = msg.IndexOf('\x03');
                 if (p != -1)
                 {
-                    //Console.WriteLine($"Aprsed: {p}, {msg.Length}");
                     var sub = msg.Substring(0, p);
                     current.Append(sub);
                     var data = current.ToString().Trim(SkipSpecialChars);
@@ -139,7 +138,7 @@ namespace WConfigurator.Services
 
         private void Updated()
         {
-            if (OnUpdate.HasDelegate)
+            if (OnUpdate != null)
                 OnUpdate.InvokeAsync();
         }
 

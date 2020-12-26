@@ -60,8 +60,8 @@ namespace WConfigurator.Data
             set
             {
                 var val = value.Trim();
-                if (val.StartsWith('{') || val.EndsWith('}'))
-                    val = val.Trim("{}".ToCharArray());
+                if (val.StartsWith('{') || val.EndsWith('}') || val.EndsWith(';'))
+                    val = val.Trim("{};".ToCharArray());
                 if (!val.StartsWith('[') || !val.EndsWith(']'))
                     val = "[" + val + "]";
 
