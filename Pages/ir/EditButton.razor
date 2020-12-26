@@ -1,5 +1,4 @@
 ﻿@page "/ir/edit/{Name}"
-@implements IDisposable
 @inject WatchService watch
 @inject InfraRemote irconfig;
 @inject NavigationManager uriHelper
@@ -67,15 +66,10 @@ else
             return;
         }
 
-        watch.OnUpdate += EventCallback.Factory.Create(this, Updated);
+        watch.OnUpdate += Updated;
 
         // Let's read current button params as first step:
         await irconfig.ExecuteShowEditButton(Name);
-    }
-
-    void IDisposable.Dispose()
-    {
-        watch.OnUpdate -= this;
     }
 
     void Updated()

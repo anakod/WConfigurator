@@ -1,5 +1,4 @@
 ﻿@page "/ir"
-@implements IDisposable
 @inject WatchService watch
 @inject InfraRemote irconfig;
 @inject NavigationManager uriHelper
@@ -39,15 +38,10 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        watch.OnUpdate += EventCallback.Factory.Create(this, UpdateUI);
+        watch.OnUpdate += UpdateUI;
 
         if (watch.IsConnected)
             await UpdateUI();
-    }
-
-    void IDisposable.Dispose()
-    {
-        watch.OnUpdate -= this;
     }
 
     async Task UpdateUI()

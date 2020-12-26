@@ -28,7 +28,7 @@ namespace WConfigurator.Services
 
         internal event Action OnBeforeCommand;
         public event Action<byte[]> OnDataReceived;
-        public MulticastEventCallback OnUpdate;
+        public MulticastSingleInstanceEventCallback OnUpdate;
 
         public void AddHandler<T>(string app, Func<T, bool> handler)
         {
